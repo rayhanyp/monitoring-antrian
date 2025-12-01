@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <div class="container">
+      <div class="content">
+        <h1 class="title">Monitoring Antrian Pelanggan</h1>
+        <div class="form-area">
+          <div class="cashier">
+            Cashier ID:
+            <input class="cashier-id" type="text">
+          </div>
+          <button class="reset-button" type="button" onclick="resetData()">Reset</button>
+          <button class="finished-list-button" type="button" onclick="location.href='finished.html'">List</button>
+        </div>
+        <div class="core">
+          <div class="empty d-none">List Kosong</div>
+            <table id="table" class="customer-list">
+              <tr class="customer-list-header">
+                <thead>
+                  <th>ID Cust</th>
+                  <th>Status</th>
+                  <th>Waktu</th>
+                  <th>Action Button</th>
+                </thead>
+              </tr>
+              <tbody></tbody>
+              <!-- <tr class="customer">
+                <td>001</td>
+                <td>Menunggu</td>
+                <td>10:00 AM</td>
+                <td class="action-button-group"><button class="customer-action-button selesai">Q</button><button class="customer-action-button hapus">X</button></td>
+              </tr> -->
+            </table>
+            <form id="gsForm" name="submit-to-google-sheet" style="display: none">
+              <input name="id" />
+              <input name="status" />
+              <input name="entry_at" />
+              <input name="payment_at" />
+              <input name="done_at" />
+            </form>
+          </div>
+          <button type="button" class="add-cust-button" onclick="addCustomer()">+</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function resetData(){
+        localStorage.clear();
+        console.log("Clear Successful");
+      }
+
+      const scriptURL =
+        "https://script.google.com/macros/s/AKfycbxJOw5VA5zVWT0U9xv8n1L8wAMnHiIJ7DuS-BiHN7EoRe2wMJdQBlGmGWWyUOGKcHQ2Yg/exec";
+      let list = JSON.parse(localStorage.getItem("queue") || "[]");
+      let lastId = parseInt(localStorage.getItem("lastId") || "0");
+
+      // Format waktu jam:menit:detik
+      function now() {
+        const d = new Date();
+
+        const jam = String(d.getHours()).padStart(2, "0");
+        const menit = String(d.getMinutes()).padStart(2, "0");
+        const detik = String(d.getSeconds()).padStart(2, "0");
+
+        return `${jam}:${menit}:${detik}`; // jj:mm:dd
+      }
+
+      // Save LocalStorage
+      function save() {
+        localStorage.setItem("queue", JSON.stringify(list));
+      }
+
+      // Tambah Antrian
+      function addCustomer() {
+        lastId++;
+        localStorage.setItem("lastId", lastId);
+
+        list.push({
+          id: lastId,
+          status: "Antri",
+          entry_at: now(),
+          payment_at: "",
+          done_at: "",
+        });
+
+        save();
+        render();
+      }
+
+      // Tekan tombol Bayar
+      function setBayar(id) {
+        const c = list.find((x) => x.id === id);
+        c.status = "Bayar";
+        c.payment_at = now();
+        save();
+        render();
+      }
+
+      // Tekan tombol Selesai
+      function setSelesai(id) {
+        const cust = list.find(x => x.id === id);
+        cust.done_at = now();
+        pushToSheet(cust);
+
+        // Ambil list selesai dari localStorage
+        const finished = JSON.parse(localStorage.getItem("finishedList") || "[]");
+
+        // Tambahkan ke list selesai
+        finished.push({
+            ...cust,
+            finishedAt: now()
+        });
+
+        // Simpan kembali
+        localStorage.setItem("finishedList", JSON.stringify(finished));
+
+        // Hapus dari list antrian
+        list = list.filter(x => x.id !== id);
+        save();
+        render();
+    }
+
+
+      // Kirim ke Google Sheets
+      function pushToSheet(c) {
+        const form = document.getElementById("gsForm");
+
+        form.id.value = c.id;
+        form.status.value = c.status;
+        form.entry_at.value = c.entry_at;
+        form.payment_at.value = c.payment_at;
+        form.done_at.value = c.done_at;
+
+        fetch(scriptURL, { method: "POST", body: new FormData(form) })
+          .then((res) => console.log("Success!", res))
+          .catch((err) => console.error("Error!", err));
+      }
+
+      // Hapus Customer
+      function removeCustomer(id) {
+        list = list.filter((x) => x.id !== id);
+        save();
+        render();
+      }
+
+      // Render tabel
+      function render() {
+        const tbody = document.querySelector("tbody");
+
+        list.sort((a, b) => {
+          const order = { "Bayar": 1, "Antri": 2, "Selesai": 3 };
+          return order[a.status] - order[b.status];
+        });
+
+        tbody.innerHTML = "";
+
+        list.forEach((c) => {
+          let actionBtn = "";
+
+          if (c.status === "Antri") {
+            actionBtn = `<button class="customer-action-button bayar" onclick="setBayar(${c.id})">B</button>`;
+            actionBtn += ` <button class="customer-action-button hapus" onclick="removeCustomer(${c.id})">X</button>`;
+          } else if (c.status === "Bayar") {
+            actionBtn = `<button class="customer-action-button selesai" onclick="setSelesai(${c.id})">S</button>`;
+            actionBtn += ` <button class="customer-action-button hapus" onclick="removeCustomer(${c.id})">X</button>`;
+          }
+
+          tbody.innerHTML += `
+      <tr>
+        <td>${c.id}</td>
+        <td>${c.status}</td>
+        <td>${
+          c.status === "Antri"
+            ? c.entry_at
+            : c.status === "Bayar"
+            ? c.payment_at
+            : c.done_at
+        }</td>
+        <td class="action-button-group">${actionBtn}</td>
+      </tr>
+    `;
+        });
+      }
+
+      render();
+    </script>
+  </body>
+</html>

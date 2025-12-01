@@ -1,0 +1,150 @@
+:root{
+    --primary-color: #232323;
+    --secondary-color: #f5f5f5;
+    --text-color: #232323;
+    --bayar-button: #005ea2;
+    --hapus-button: #a20000;
+    --selesai-button: #00a200;
+}
+
+.d-none{
+    display: none;
+}
+
+body{
+    padding: 0;
+    margin: 0;
+    font-family: "Poppins", sans-serif;
+}
+
+.container{
+    display: flex;
+    justify-content: start;
+    align-items: start;
+    background-color: var(--primary-color);
+}
+
+.content{
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.title{
+    color: var(--secondary-color);
+    padding: 2rem;
+}
+
+.core{
+    width: 100%;
+    height: 100%;
+    background-color: var(--secondary-color);
+    border-radius: 30px 30px 0px 0px;
+    display: flex;
+    justify-content: center;
+    align-items: start;
+    padding-top: 2rem;
+}
+
+.add-cust-button{
+    width: 72px;
+    height: 72px;
+    font-size: 30pt;
+    border-radius: 100px;
+    position: fixed;
+    bottom: 50px;
+    right: 30px;
+    border: none;
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+    transition: 0.2s;
+}
+
+.add-cust-button:active{
+    transform: scale(0.85);
+}
+
+.customer-list{
+    font-size: 9pt;
+    width: 95%;
+    text-align: center;
+    border-spacing: 1rem;
+}
+
+.customer-action-button{
+    border: none;
+    color: var(--secondary-color);
+    border-radius: 10px;
+    width: 80%;
+    height: 2.5rem;
+}
+
+.action-button-group{
+    display: flex;
+    gap: 4px;
+}
+
+.customer-action-button.bayar{
+    background-color: var(--bayar-button);
+}
+
+.customer-action-button.selesai{
+    background-color: var(--selesai-button);
+}
+
+.customer-action-button.hapus{
+    color: var(--secondary-color);
+    background-color: var(--hapus-button);
+}
+
+.form-area{
+    padding-inline: 2rem;
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    gap: 16px;
+}
+
+.cashier{
+    font-size: 9pt;
+    color: var(--secondary-color);
+}
+
+.cashier-id{
+    width: 30px;
+    border-radius: 10px;
+    padding-left: 10px;
+    padding-block: 4px;
+    margin-left: 10px;
+    background-color: rgba(255, 255, 255, 0.216);
+    border: none;
+    color: var(--secondary-color);
+}
+
+.cashier-id:focus{
+    border: none !important;
+    outline: none !important;
+}
+
+.reset-button{
+    margin-left: auto;
+    background-color: #005ea2;
+}
+
+.reset-button, .finished-list-button{
+    background-color: transparent;
+    border: none;
+    color: var(--secondary-color);
+}
+
+.finished-table{
+    border: 1px solid black;
+    width: 90%;
+    margin: 5%;
+    text-align: center;
+}
+
+.finished-table td{
+    padding-block: 8px;
+}

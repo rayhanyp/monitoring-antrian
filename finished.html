@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <table id="finishedTable" class="finished-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Status</th>
+          <th>Waktu Selesai</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <script>
+      const finished = JSON.parse(localStorage.getItem("finishedList") || "[]");
+      const tbody = document.querySelector("#finishedTable tbody");
+
+      finished.forEach((c) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+        <td>${c.id}</td>
+        <td>Selesai</td>
+        <td>${c.finishedAt}</td>
+    `;
+        tbody.appendChild(tr);
+      });
+    </script>
+  </body>
+</html>
