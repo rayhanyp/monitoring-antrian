@@ -142,9 +142,19 @@ body{
     border: 1px solid black;
     width: 90%;
     margin: 5%;
+    padding: 1rem;
     text-align: center;
 }
 
 .finished-table td{
     padding-block: 8px;
+}
+
+.back-button{
+    margin: 1rem;
+    border: none;
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+    padding: 8px 16px 8px 16px;
+    border-radius: 10px;
 }
